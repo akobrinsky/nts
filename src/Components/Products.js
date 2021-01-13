@@ -1,50 +1,54 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import Product from './Product';
 import Modal from './Modal';
 
 const Products = (props) => {
   const [products, setProducts] = useState([]);
-  const [offset, setOffset] = useState(0);
   const [isShowing, setIsShowing] = useState(false);
-  const [modalInfo, setModalInfo] = useState({});
+  const [modalIndex, setModalIndex] = useState({});
+  const [isFetching, setIsFetching] = useState(false);
+  const [offset, setOffset] = useState(0);
   const loader = useRef(null);
+  const loadMore = useCallback(
+    (entities) => {
+      const target = entities[0];
+      if (target.isIntersecting) {
+        !isFetching && setOffset((offset) => offset + 10);
+      }
+    },
+    [isFetching]
+  );
 
+  // using intersection observer api to listen for end-of-page div
   useEffect(() => {
     const options = {
       root: null,
       rootMargin: '0px',
       threshold: 0.25,
     };
-    const observer = new IntersectionObserver(handleObserver, options);
-    if (loader && loader.current) {
-      observer.observe(loader.current);
+    const node = loader.current;
+    const observer = new IntersectionObserver(loadMore, options);
+    if (loader && node) {
+      observer.observe(node);
     }
-    return () => observer.unobserve(loader.current);
-  }, []);
+    return () => observer.unobserve(node);
+  }, [loader, loadMore]);
 
-  const handleObserver = (entities) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
-      setOffset((offset) => offset + 10);
-    }
-  };
-
-  const modalHandler = (e, id) => {
+  const modalHandler = (e, idx) => {
     e.preventDefault();
-    const productInfo = products[id];
-    setModalInfo(productInfo);
-    setIsShowing(true);
+    setModalIndex(idx);
+    modalToggle();
   };
 
   const modalToggle = () => {
     setIsShowing(!isShowing);
   };
-
   useEffect(() => {
     const config = {
       Authorization: `Bearer ${props.token}`,
     };
+    setIsFetching(true);
     axios
       .get(
         `https://api.commercetools.co/nuts-custom-demo-1/products?offset=${offset}&limit=10`,
@@ -57,13 +61,13 @@ const Products = (props) => {
           const insertObj = {
             id: current.slug.en,
             name: current.name.en,
-            description: current.description ? current.description.en : 'n/a',
+            description: current.description ? current.description.en : 'N/A',
             price: masterVariant.prices.length
               ? (masterVariant.prices[0].value.centAmount / 100).toFixed(2)
-              : '0.00',
+              : 'N/A',
             organic: masterVariant.attributes[1]
               ? masterVariant.attributes[1].value
-              : 'n/a',
+              : 'N/A',
             badge:
               'https://1b0bbb9e89b4713adcc7-aea4cee2cb18344b328e3a03eff3ec4f.ssl.cf1.rackcdn.com/5e85d71501308335-L2AE6hCf-thumb.jpg',
             image: masterVariant.images.length
@@ -73,9 +77,11 @@ const Products = (props) => {
           acc.push(insertObj);
           return acc;
         }, []);
-        setProducts([...products, ...fetchedProducts]);
+
+        setProducts((p) => [...p, ...fetchedProducts]);
+        setIsFetching(false);
       });
-  }, [offset]);
+  }, [offset, props.token]);
 
   return (
     <div className="container">
@@ -94,7 +100,11 @@ const Products = (props) => {
           : null}
 
         {isShowing && (
-          <Modal close={modalToggle} isShowing={isShowing} info={modalInfo} />
+          <Modal
+            close={modalToggle}
+            isShowing={isShowing}
+            info={products[modalIndex]}
+          />
         )}
       </div>
       <div id="end-of-page" ref={loader}></div>

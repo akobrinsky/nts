@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import 'bulma/css/bulma.css';
 import Products from './Components/Products';

@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   grid-gap: 2em;
+  min-height: 1300px;
 }
 .badge {
   bottom: 0.5em;
@@ -18,5 +19,6 @@
   min-height: 4em;
 }
 #end-of-page {
-  height: 20px;
+  height: 150px;
+  width: 100%;
 }
