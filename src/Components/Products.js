@@ -53,7 +53,6 @@ const Products = (props) => {
         const fetchedProducts = data.results.reduce((acc, product) => {
           const { current } = product.masterData;
           const { masterVariant } = current;
-          console.log(masterVariant.images);
           const insertObj = {
             id: current.slug.en,
             name: current.name.en,
