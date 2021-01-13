@@ -17,3 +17,6 @@
 .navbar-item img {
   min-height: 4em;
 }
+#end-of-page {
+  height: 20px;
+}

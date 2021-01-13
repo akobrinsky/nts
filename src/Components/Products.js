@@ -6,21 +6,21 @@ import Modal from './Modal';
 const Products = (props) => {
   const [products, setProducts] = useState([]);
   const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
-  const [modalId, setModalID] = useState({});
+  const [modalInfo, setModalInfo] = useState({});
   const loader = useRef(null);
 
   useEffect(() => {
     const options = {
       root: null,
-      rootMargin: '20px',
-      threshold: 1.0,
+      rootMargin: '0px',
+      threshold: 0.25,
     };
     const observer = new IntersectionObserver(handleObserver, options);
-    if (loader.current) {
+    if (loader && loader.current) {
       observer.observe(loader.current);
     }
+    return () => observer.unobserve(loader.current);
   }, []);
 
   const handleObserver = (entities) => {
@@ -29,18 +29,19 @@ const Products = (props) => {
       setOffset((offset) => offset + 10);
     }
   };
+
   const modalHandler = (e, id) => {
     e.preventDefault();
     const productInfo = products[id];
-    setModalID(productInfo);
+    setModalInfo(productInfo);
     setIsShowing(true);
   };
+
   const modalToggle = () => {
     setIsShowing(!isShowing);
   };
 
   useEffect(() => {
-    setLoading(true);
     const config = {
       Authorization: `Bearer ${props.token}`,
     };
@@ -73,18 +74,17 @@ const Products = (props) => {
           return acc;
         }, []);
         setProducts([...products, ...fetchedProducts]);
-        setLoading(false);
       });
   }, [offset]);
 
   return (
-    <div className="container py-4">
+    <div className="container">
       <h1 className="title is-1 my-6">New Products</h1>
       <div className="products">
         {products.length
           ? products.map((prod, idx) => (
               <Product
-                key={prod.id}
+                key={`${prod.id}${idx}`}
                 id={prod.id}
                 info={prod}
                 modalHandler={modalHandler}
@@ -94,15 +94,10 @@ const Products = (props) => {
           : null}
 
         {isShowing && (
-          <Modal close={modalToggle} isShowing={isShowing} info={modalId} />
+          <Modal close={modalToggle} isShowing={isShowing} info={modalInfo} />
         )}
       </div>
       <div id="end-of-page" ref={loader}></div>
-      {loading && (
-        <button className="button is-block has-text-centered">
-          Loading more products
-        </button>
-      )}
     </div>
   );
 };
