@@ -10,6 +10,7 @@ const Products = (props) => {
   const [isFetching, setIsFetching] = useState(false);
   const [offset, setOffset] = useState(0);
   const loader = useRef(null);
+
   const loadMore = useCallback(
     (entities) => {
       const target = entities[0];
@@ -44,6 +45,7 @@ const Products = (props) => {
   const modalToggle = () => {
     setIsShowing(!isShowing);
   };
+
   useEffect(() => {
     const config = {
       Authorization: `Bearer ${props.token}`,
