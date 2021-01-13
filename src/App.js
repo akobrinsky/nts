@@ -14,31 +14,34 @@ function App() {
       >
         <div className="container">
           <div className="navbar-brand">
-            <a className="navbar-item logo" href="https://bulma.io">
-              <img src="https://nuts.com/nutshell/img/nuts-logo-420b6a54.svg" />
+            <a className="navbar-item logo" href="https://nuts.com">
+              <img
+                alt="nuts logo"
+                src="https://nuts.com/nutshell/img/nuts-logo-420b6a54.svg"
+              />
             </a>
 
-            <a
-              role="button"
+            <button
               className="navbar-burger"
               aria-label="menu"
               aria-expanded="false"
               data-target="nuts-nav"
+              href="#"
             >
               <span aria-hidden="true"></span>
               <span aria-hidden="true"></span>
               <span aria-hidden="true"></span>
-            </a>
+            </button>
           </div>
 
           <div id="nuts-nav" className="navbar-menu">
             <div className="navbar-end">
               <div className="navbar-item">
                 <div className="buttons">
-                  <a className="button is-primary">
+                  <button className="button is-primary">
                     <strong>View Cart</strong>
-                  </a>
-                  <a className="button is-light">Log in</a>
+                  </button>
+                  <button className="button is-light">Log in</button>
                 </div>
               </div>
             </div>
