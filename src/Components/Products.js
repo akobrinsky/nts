@@ -15,7 +15,10 @@ const Products = (props) => {
     (entities) => {
       const target = entities[0];
       if (target.isIntersecting) {
-        !isFetching && setOffset((offset) => offset + 10);
+        !isFetching &&
+          setOffset((offset) => {
+            return offset === 0 ? (offset += 11) : (offset += 10);
+          });
       }
     },
     [isFetching]
@@ -58,10 +61,11 @@ const Products = (props) => {
       )
       .then(({ data }) => {
         const fetchedProducts = data.results.reduce((acc, product) => {
+          const { id } = product;
           const { current } = product.masterData;
           const { masterVariant } = current;
           const insertObj = {
-            id: current.slug.en,
+            id,
             name: current.name.en,
             description: current.description ? current.description.en : 'N/A',
             price: masterVariant.prices.length
@@ -92,7 +96,7 @@ const Products = (props) => {
         {products.length
           ? products.map((prod, idx) => (
               <Product
-                key={`${prod.id}${idx}`}
+                key={`${prod.id}`}
                 id={prod.id}
                 info={prod}
                 modalHandler={modalHandler}
